@@ -106,6 +106,7 @@ These parameters needs to be created in the main report as well. The parameter n
 In JasperStudio:
 * Navigate to Parameters in the main report and add for each datasource a parameter of type "net.sf.jasperreports.engine.data.JsonDataSource".
 * Click on the subreport component and navigate to Properties. On Data Source Expression add the parameter name : $P(*parameter name*).
+* Note: when using data source expressions, generating an example in JasperStudio will fail.
 
 To use datasources for main and subreports, the body of the request must contain the following information :
 - jasper (required) : location of the report file
@@ -204,3 +205,10 @@ The request body can contain the following keys :
                 "heightMM": 400,
                 "widthMM", 600,
             }
+
+
+## References
+* [Creating JasperReports with subreports using datasource](http://junaedhalim.blogspot.com/2009/12/creating-jasperreport-with-subreports.html)
+
+## Credits
+* Patrick Kremer - Kabelwerk Eupen AG
