@@ -79,7 +79,7 @@ To override the data adapter with a data source, the body of the request must co
                 "datasources": [
                     {
                         "id": "MAIN",
-                        "json": "D:\\temp\\Deknudt2\\FAKT_B2B_20221001_080000.json",
+                        "json": "D:\\temp\\FAKT_B2B_20221001_080000.json",
                         "rootProperty": "factuur"
                     }
                 ]                
@@ -124,7 +124,7 @@ To use datasources for main and subreports, the body of the request must contain
                 "datasources": [
                     {
                         "id": "MAIN",
-                        "json": "D:\\temp\\Deknudt2\\FAKT_B2B_20221001_080000.json",
+                        "json": "D:\\temp\\FAKT_B2B_20221001_080000.json",
                         "rootProperty": "factuur"
                     },
                     {
