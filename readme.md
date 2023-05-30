@@ -149,6 +149,43 @@ To use datasources for main and subreports, the body of the request must contain
                 "outfile": "D:\\temp\\FAKT_B2B_20221013_0843.pdf"
             }
 
+### Creating Jasper Reports based on xml data source (variable xml file)
+
+Creating a pdf from a report can be done by sending a request to **/jasper/generatepdf**.
+
+When adding a **main datasource** in the request body, the data adapter will be overriden.
+Note : the data adapter and the xml file specified in the data adapter must still exist.
+
+This datasource needs two parameters : the location of the xml file and the root node to be used in de XPath expression.
+
+To override the data adapter with a data source, the body of the request must contain the following keys :
+- jasper (required) : location of the report file
+- outfile (optional) : path of the pdf file to be created, if not provided a file will be created containing a timestamp.
+- datasources (required) object containing :
+    - id (required) : "MAIN" (fixed value)
+    - xml (required) : location of the xml file
+    - rootProperty (required) : root node for XPath expression
+
+            GET http://localhost:10900/jasper/generatepdf
+
+            Request body :
+            {
+                "jasper": "D:\\temp\\FAKT_B2B.jasper",
+                "datasources": [
+                    {
+                        "id": "MAIN",
+                        "xml": "G:\\My Drive\\CD-Invest\\Klanten\\Optimco\\jasper\\test\\O-017806886.xml",
+                        "rootProperty": "/Body/Document"
+                    }
+                ]                
+            }
+
+            Response : 
+            {
+                "success": true,
+                "outfile": "G:\\My Drive\\CD-Invest\\Klanten\\Optimco\\jasper\\test\\BriefSchade_20230530_103254.pdf",
+                "jasper": "G:\\My Drive\\CD-Invest\\Klanten\\Optimco\\jasper\\test\\BriefSchade.jasper"
+            }
 
 ## ZPL Conversion 
 

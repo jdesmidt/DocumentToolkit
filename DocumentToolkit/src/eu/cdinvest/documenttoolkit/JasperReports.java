@@ -15,6 +15,8 @@ import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.AbstractXmlDataSource;
+import net.sf.jasperreports.engine.data.JRXmlDataSource;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 
 public class JasperReports {
@@ -56,6 +58,7 @@ public class JasperReports {
 
 		JSON jsonOut = new JSON();
 		JsonDataSource jsonMainDataSource = null;
+		AbstractXmlDataSource<JRXmlDataSource> xmlMainDataSource = null;
 
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		JasperPrint jasperPrint = null;
@@ -69,13 +72,14 @@ public class JasperReports {
 		// outfile / pdf file name - optional parameter
 		String outfile = jsonIn.getString("outfile");
 		if (outfile == null)
-			outfile = jasper.substring(0, jasper.lastIndexOf(".")) + '_' + ZonedDateTime.now( ZoneOffset.of("+02:00") ).format( DateTimeFormatter.ofPattern( "yyyyMMdd_HHmm" ) ) + ".pdf";
+			outfile = jasper.substring(0, jasper.lastIndexOf(".")) + '_' + ZonedDateTime.now( ZoneOffset.of("+02:00") ).format( DateTimeFormatter.ofPattern( "yyyyMMdd_HHmmss" ) ) + ".pdf";
 
 		// datasources for main and subreports - optional parameter
 		if (jsonIn.getJSONObject().has("datasources")) {
 			JSONArray datasources = jsonIn.getJSONObject().getJSONArray("datasources");
 
 			String jsonMain = null;
+			String xmlMain = null;
 			String rootPropertyMain = null;
 
 			for (int i = 0; i < datasources.length(); i++) {
@@ -83,9 +87,9 @@ public class JasperReports {
 
 				if (ds.getString("id").equals("MAIN")) {
 					jsonMain = ds.getString("json");
+					xmlMain = ds.getString("xml");
 					rootPropertyMain = ds.getString("rootProperty");
 				}
-				;
 			}
 
 			if (jsonMain != null && rootPropertyMain != null) {
@@ -111,13 +115,41 @@ public class JasperReports {
 					}
 				}
 			}
+			
+			if (xmlMain != null && rootPropertyMain != null) {
+				xmlMainDataSource = new JRXmlDataSource(new File(xmlMain), rootPropertyMain);
+
+				for (int i = 0; i < datasources.length(); i++) {
+					JSON ds = new JSON(datasources.getJSONObject(i));
+					String idSubReport = ds.getString("id");
+					String xmlSubReport = null;
+					String rootPropertySubReport = null;
+
+					if (!idSubReport.equals("MAIN") && idSubReport != null) {
+						xmlSubReport = ds.getString("xml");
+						if (xmlSubReport == null)
+							xmlSubReport = xmlMain;
+						rootPropertySubReport = ds.getString("rootProperty");
+					}
+
+					if (idSubReport != null && xmlSubReport != null && rootPropertySubReport != null) {
+						AbstractXmlDataSource<JRXmlDataSource> xmlSubDataSource = new JRXmlDataSource(new File(xmlSubReport),
+								rootPropertySubReport);
+						parameters.put(ds.getString("id"), xmlSubDataSource);
+					}
+				}
+			}
 		}
 
 		// Process creation of report
 		try {
 			if (jsonMainDataSource != null) {
 				jasperPrint = JasperFillManager.fillReport(jasper, parameters, jsonMainDataSource);
-			} else {
+			} 
+			else if (xmlMainDataSource != null) {
+				jasperPrint = JasperFillManager.fillReport(jasper, parameters, xmlMainDataSource);
+			} 
+			else {
 				jasperPrint = JasperFillManager.fillReport(jasper, parameters);
 			}
 

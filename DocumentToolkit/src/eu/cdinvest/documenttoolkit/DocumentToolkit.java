@@ -54,6 +54,8 @@ public class DocumentToolkit {
 			try {
 				String uri = t.getRequestURI().toString().toLowerCase();
 				
+				System.out.println(uri);
+				
 				switch (uri) {
 				case "/jasper/compilereport":
 					jsonOut = JasperReports.compileReport(jsonIn);
